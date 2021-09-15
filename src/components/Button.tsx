@@ -23,9 +23,7 @@ const StyledButton = styled.button<ButtonProps>`
     margin: ${css`${(props: ButtonProps) => props.margin}`};
     font-size: ${css`${(props: ButtonProps) => props.size === 'full' ? '2rem':'1.5rem'}`};
     font-weight: 700;
-    letter-spacing: -.02em;
     border-radius: ${css`${(props: ButtonProps) => props.size === 'full' ? '0 .8rem .8rem .8rem':'.8rem'}`};;
-    line-height: 1.2;
     border: none;
     color: #fff;
     outline: none;

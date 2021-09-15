@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { ValidateRule } from '../types/common';
 import Button from './Button';
 
 type InputProps = {
@@ -10,22 +11,56 @@ type InputProps = {
         placeHolder: string,
         buttonText: string
     };
+    validation?: ValidateRule[]
 };
+
+function Input({name, title, placeHolder, sub, validation}: InputProps) {
+
+    const [validateRules, setValidateRules] = useState<ValidateRule[]>([]);
+    const [text, setText] = useState('');
+    const [errorText, setErrorText] = useState('');
+
+    useEffect(()=>{
+        initValidate();
+    },[])
+
+    useEffect(()=>{
+        const errorMessage = validate()?.message;
+        setErrorText(errorMessage?errorMessage:'');
+    },[text])
+
+    const onChangeInputText = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setText(e.target.value);
+    };
+
+    // 받아온 props로 체크할 유효성 규칙 넣기
+    const initValidate = () => {
+        setValidateRules(validation?validation:[])
+    }
+
+    // 체크할 유효성 filter로 돌려서 안 맞으면 첫번째 rule의 messege return 
+    const validate = (): ValidateRule | null => {
+        const invalidateRules = validateRules
+          .filter(validateRule => validateRule.rule.test(text) !== validateRule.match);
+          console.log(validateRules)
+        return (invalidateRules.length > 0) ? invalidateRules[0] : null;
+      }
   
-function Input({name, title, placeHolder, sub}: InputProps) {
+
     return (
       <StyledInputWrap>
           <label htmlFor={name}>{title}</label>
           {sub ?
             <>
                 <div>
-                    <StyledInput name={name} placeholder={placeHolder}/>
+                    <StyledInput name={name} placeholder={placeHolder} value={text} onChange={()=>onChangeInputText}/>
                     <Button enable={false} size="13" margin="0 0 0 1rem">{sub.buttonText}</Button>
                 </div>
                 <StyledInput placeholder={sub.placeHolder}/>
             </>
-            :<StyledInput name={name} placeholder={placeHolder}/>
+            :<StyledInput name={name} placeholder={placeHolder} value={text} onChange={onChangeInputText}/>
           } 
+          {errorText && <StyledErrorBox>{errorText}</StyledErrorBox> }
       </StyledInputWrap>
     );
   }
@@ -70,4 +105,12 @@ const StyledInput = styled.input`
         margin-top: 1rem;
     }
 `;
+
+const StyledErrorBox = styled.p`
+    margin: 0;
+    padding: 1.2rem 0 1.3rem;
+    font-size: 1.4rem;
+    color: #fc4c4c;
+`;
+  
   
